@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>System Broadcast Panel</title>
+  <style>
+    body { font-family: system-ui, sans-serif; background: #f8fafc; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 90vh; }
+    .box { background: #fff; padding: 24px; border-radius: 16px; width: 100%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+    input, textarea { width: 100%; padding: 10px; margin-bottom: 12px; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; font-family: inherit;}
+    button { width: 100%; background: #2563eb; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+    button:hover { background: #1d4ed8; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>📱 OS Push Broadcaster</h2>
+    <label>Notification Title</label>
+    <input type="text" id="title" value="🎉 Special Prize Update!">
+    
+    <label>Message Body</label>
+    <textarea id="msg">Your prize package is ready for download. Tap to view.</textarea>
+    
+    <button id="send">Broadcast System Push</button>
+  </div>
+
+  <script>
+    const channel = new BroadcastChannel("web_app_push_channel");
+
+    document.getElementById("send").addEventListener("click", () => {
+      const title = document.getElementById("title").value;
+      const message = document.getElementById("msg").value;
+
+      channel.postMessage({ title, message });
+      alert("Broadcast sent to Service Worker! Check your device notification tray.");
+    });
+  </script>
+</body>
+</html>
