@@ -3,17 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Mobile & Desktop Push App</title>
+  <title>Prize Portal Demo</title>
+  
+  <!-- iOS PWA Tags -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="PrizeApp">
+
   <style>
     :root {
       --primary: #16a34a;
+      --primary-hover: #15803d;
       --bg: #f4f7f6;
       --card-bg: #ffffff;
       --text: #111827;
+      --text-muted: #4b5563;
     }
 
+    * { box-sizing: border-box; }
+
     body {
-      font-family: system-ui, -apple-system, sans-serif;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background-color: var(--bg);
       color: var(--text);
       margin: 0;
@@ -24,137 +35,186 @@
       padding: 16px;
     }
 
-    .container {
+    .main-card {
       background: var(--card-bg);
       width: 100%;
-      max-width: 400px;
-      padding: 24px;
-      border-radius: 16px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+      max-width: 420px;
+      padding: 28px 20px;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
       text-align: center;
     }
 
-    h1 { font-size: 1.5rem; margin-top: 0; }
-    p { color: #4b5563; font-size: 0.95rem; line-height: 1.4; }
+    h1 { font-size: 1.6rem; margin-top: 0; }
+    p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.5; }
 
-    .btn {
+    .btn-test {
+      width: 100%;
       background: #0f172a;
       color: white;
       border: none;
-      padding: 12px 20px;
+      padding: 14px;
       font-size: 1rem;
-      border-radius: 10px;
-      cursor: pointer;
-      width: 100%;
-      margin-top: 12px;
       font-weight: 600;
+      border-radius: 12px;
+      cursor: pointer;
+      margin-top: 16px;
     }
 
-    /* Responsive Custom Soft Banner */
-    #custom-banner {
+    /* Floating Soft Prompt Banner */
+    #prompt-banner {
       display: none;
       position: fixed;
       bottom: 20px;
       left: 50%;
       transform: translateX(-50%);
       width: calc(100% - 32px);
-      max-width: 380px;
+      max-width: 420px;
       background: #ffffff;
       padding: 20px;
       border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
       z-index: 10000;
-      border: 1px solid #e1e4e8;
+      border: 1px solid #e2e8f0;
       text-align: left;
     }
 
-    #custom-banner h3 { margin: 0 0 6px 0; font-size: 1.1rem; }
-    #custom-banner p { margin: 0 0 16px 0; font-size: 0.85rem; }
+    #prompt-banner h3 { margin: 0 0 6px 0; font-size: 1.1rem; color: #111; }
+    #prompt-banner p { margin: 0 0 16px 0; font-size: 0.88rem; color: #555; }
 
     .banner-actions { display: flex; gap: 8px; }
-    .btn-claim { background: var(--primary); color: white; border: none; padding: 10px; border-radius: 8px; flex: 1; font-weight: bold; cursor: pointer; }
-    .btn-skip { background: #f1f5f9; color: #64748b; border: none; padding: 10px; border-radius: 8px; cursor: pointer; }
-    
-    .admin-link { display: block; margin-top: 20px; color: #2563eb; text-decoration: none; font-size: 14px; }
+
+    .btn-claim {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      flex: 1;
+      text-align: center;
+    }
+
+    .btn-claim:hover { background: var(--primary-hover); }
+
+    .btn-deny {
+      background: #f1f5f9;
+      color: #64748b;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* iOS Installation Guide Instructions */
+    .ios-steps {
+      background: #f8fafc;
+      border: 1px dashed #cbd5e1;
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 12px;
+      font-size: 0.85rem;
+      color: #334155;
+    }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <h1>Prize Portal</h1>
-    <p>Test system-level notifications for mobile and desktop devices.</p>
-    <button class="btn" id="test-system-notif">Test Direct OS Notification</button>
-    <a href="admin.html" target="_blank" class="admin-link">Open Broadcast Dashboard ↗</a>
+  <div class="main-card">
+    <h1>Prize Claim Portal</h1>
+    <p>Frontend Notification Test Bed for Mobile (iOS & Android) and Desktop.</p>
+    <button class="btn-test" id="manual-trigger-btn">Re-open Claim Banner</button>
   </div>
 
-  <!-- Soft Custom Prompt with Your Wording -->
-  <div id="custom-banner">
-    <h3>🎉 You are a winner!</h3>
-    <p>Click the button to claim your price and enable live system notifications.</p>
+  <!-- Dynamic Soft Prompt Banner -->
+  <div id="prompt-banner">
+    <h3 id="banner-title">🎉 You are a winner!</h3>
+    <p id="banner-desc">Click the button to claim your prize and enable live notifications.</p>
+    
+    <!-- Container for iOS Home Screen Instructions -->
+    <div id="ios-instruction-box" style="display: none;" class="ios-steps">
+      <strong>iPhone Setup:</strong><br>
+      1. Tap the <strong>Share</strong> or <strong>Menu (•••)</strong> icon in your browser.<br>
+      2. Scroll and tap <strong>"Add to Home Screen"</strong>.<br>
+      3. Open the app from your Home Screen to claim!
+    </div>
+
     <div class="banner-actions">
-      <button class="btn-claim" id="claim-btn">Claim Price</button>
-      <button class="btn-skip" id="skip-btn">No Thanks</button>
+      <button id="claim-btn" class="btn-claim">Claim Prize</button>
+      <button id="deny-btn" class="btn-deny">No Thanks</button>
     </div>
   </div>
 
   <script>
-    // 1. Register the Service Worker for Background/OS level delivery
+    // Register Service Worker
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js')
-        .then(() => console.log("Service Worker Registered Successfully!"))
-        .catch(err => console.error("Service Worker Registration Failed", err));
+      navigator.serviceWorker.register('sw.js').catch(console.error);
     }
 
-    const banner = document.getElementById("custom-banner");
-    
-    setTimeout(() => {
-      if (Notification.permission === "default") {
+    document.addEventListener("DOMContentLoaded", () => {
+      const banner = document.getElementById("prompt-banner");
+      const title = document.getElementById("banner-title");
+      const desc = document.getElementById("banner-desc");
+      const iosBox = document.getElementById("ios-instruction-box");
+      const claimBtn = document.getElementById("claim-btn");
+      const denyBtn = document.getElementById("deny-btn");
+      const manualBtn = document.getElementById("manual-trigger-btn");
+
+      // Environment Detection
+      const isIos = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+      const isStandalone = (window.navigator.standalone === true) || (window.matchMedia('(display-mode: standalone)').matches);
+
+      function initializeBanner() {
+        if (isIos && !isStandalone) {
+          // iOS in standard browser mode (Safari/Chrome)
+          title.innerText = "📲 Add to Home Screen First";
+          desc.innerText = "Apple requires adding this app to your Home Screen before notifications can be delivered.";
+          iosBox.style.display = "block";
+          claimBtn.style.display = "none"; // Hide claim until launched from Home Screen
+        } else {
+          // Running on Desktop, Android, or iOS Standalone Mode
+          title.innerText = "🎉 You are a winner!";
+          desc.innerText = "Click the button to claim your prize and enable live system notifications.";
+          iosBox.style.display = "none";
+          claimBtn.style.display = "block";
+        }
         banner.style.display = "block";
       }
-    }, 1000);
 
-    async function requestOSPermission() {
-      banner.style.display = "none";
-      const permission = await Notification.requestPermission();
-      
-      if (permission === "granted") {
-        const reg = await navigator.serviceWorker.ready;
-        reg.showNotification("🏆 Prize Claimed!", {
-          body: "Your system notifications are now active on this device.",
-          icon: "https://via.placeholder.com/128"
-        });
-      } else {
-        alert("Permission denied. System banners cannot be displayed.");
+      // Initial execution
+      setTimeout(initializeBanner, 800);
+
+      manualBtn.addEventListener("click", initializeBanner);
+
+      // Claim Action (Triggers permission + fires local test notification)
+      async function handleClaim() {
+        banner.style.display = "none";
+
+        if (!("Notification" in window)) {
+          alert("This browser does not support web notifications.");
+          return;
+        }
+
+        const permission = await Notification.requestPermission();
+
+        if (permission === "granted") {
+          if ('serviceWorker' in navigator) {
+            const reg = await navigator.serviceWorker.ready;
+            reg.showNotification("🏆 Prize Claimed Successfully!", {
+              body: "Congratulations! You will now receive alerts on this device.",
+              icon: "https://via.placeholder.com/128"
+            });
+          }
+        } else {
+          alert("Notification permission was denied in browser settings.");
+        }
       }
-    }
 
-    document.getElementById("claim-btn").addEventListener("click", requestOSPermission);
-    document.getElementById("skip-btn").addEventListener("click", requestOSPermission);
-
-    // Direct manual test button
-    document.getElementById("test-system-notif").addEventListener("click", async () => {
-      if (Notification.permission === "granted") {
-        const reg = await navigator.serviceWorker.ready;
-        reg.showNotification("⚡ Test System Alert", {
-          body: "This is what a real system-level phone/desktop banner looks like!",
-          icon: "https://via.placeholder.com/128"
-        });
-      } else {
-        requestOSPermission();
-      }
+      claimBtn.addEventListener("click", handleClaim);
+      denyBtn.addEventListener("click", handleClaim);
     });
-
-    // Listen for broadcasts from admin panel to push real system notifications
-    const channel = new BroadcastChannel("web_app_push_channel");
-    channel.onmessage = async (event) => {
-      if (Notification.permission === "granted") {
-        const reg = await navigator.serviceWorker.ready;
-        reg.showNotification(event.data.title, {
-          body: event.data.message,
-          icon: "https://via.placeholder.com/128"
-        });
-      }
-    };
   </script>
 </body>
 </html>
